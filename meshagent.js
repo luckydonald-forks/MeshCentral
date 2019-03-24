@@ -360,6 +360,7 @@ module.exports.CreateMeshAgent = function (parent, db, ws, req, args, domain) {
                     // Check that the server hash matches our own web certificate hash (SHA384)
                     if ((getWebCertHash(domain) != msg.substring(2, 50)) && (getWebCertFullHash(domain) != msg.substring(2, 50))) {
                         console.log('Agent bad web cert hash (Agent:' + (Buffer.from(msg.substring(2, 50), 'binary').toString('hex').substring(0, 10)) + ' != Server:' + (Buffer.from(getWebCertHash(domain), 'binary').toString('hex').substring(0, 10)) + ' or ' + (new Buffer(getWebCertFullHash(domain), 'binary').toString('hex').substring(0, 10)) + '), holding connection (' + obj.remoteaddrport + ').');
+                        console.log('Blll! '.domain);
                         console.log('Agent reported web cert hash:' + (Buffer.from(msg.substring(2, 50), 'binary').toString('hex')) + '.');
                         return;
                     }
@@ -562,7 +563,7 @@ module.exports.CreateMeshAgent = function (parent, db, ws, req, args, domain) {
                 console.log('Agent connected with invalid domain/mesh, holding connection (' + obj.remoteaddrport + ', ' + obj.dbMeshKey + ').');
                 return;
             }
-        } 
+        }
         if (mesh.mtype != 2) { console.log('Agent connected with invalid mesh type, holding connection (' + obj.remoteaddrport + ').'); return; } // If we disconnect, the agnet will just reconnect. We need to log this or tell agent to connect in a few hours.
         */
 
@@ -631,7 +632,7 @@ module.exports.CreateMeshAgent = function (parent, db, ws, req, args, domain) {
                     // If we disconnect, the agent will just reconnect. We need to log this or tell agent to connect in a few hours.
                     console.log('Agent connected with invalid mesh type, holding connection (' + obj.remoteaddrport + ').');
                     return;
-                } 
+                }
 
                 // Mark when this device connected
                 obj.connectTime = Date.now();

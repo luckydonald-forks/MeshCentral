@@ -119,6 +119,8 @@ module.exports.CreateWebServer = function (parent, db, args, certificates) {
 
     // Compute the hash of all of the web certificates for each domain
     for (var i in obj.parent.config.domains) {
+        console.log("obj.parent.config.domains: ", obj.parent.config.domains);
+
         if (obj.parent.config.domains[i].certhash != null) {
             // If the web certificate hash is provided, use it.
             obj.webCertificateHashs[i] = obj.webCertificateFullHashs[i] = Buffer.from(obj.parent.config.domains[i].certhash, 'hex').toString('binary');
@@ -276,7 +278,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates) {
 
                 if (ip) { for (var i = 0; i < ipList.length; i++) { if (require('ipcheck').match(ip, ipList[i])) { if (closeIfThis === true) { try { req.close(); } catch (e) { } } return true; } } }
                 if (closeIfThis === false) { try { req.close(); } catch (e) { } }
-            } 
+            }
         } catch (e) { console.log(e); } // Should never happen
         return false;
     }
@@ -500,7 +502,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates) {
                     checkUserOneTimePassword(req, domain, user, req.body.token, req.body.hwtoken, function (result) {
                         if (result == false) {
                             var randomWaitTime = 0;
-                            
+
                             // 2-step auth is required, but the token is not present or not valid.
                             if ((req.body.token != null) || (req.body.hwtoken != null)) {
                                 randomWaitTime = 2000 + (obj.crypto.randomBytes(2).readUInt16BE(0) % 4095); // This is a fail, wait a random time. 2 to 6 seconds.
@@ -2046,15 +2048,15 @@ module.exports.CreateWebServer = function (parent, db, args, certificates) {
         if ((user.siteadmin & 1) == 0) { res.sendStatus(401); return; } // Check if we have server backup rights
 
         // Require modules
-        const archive = require('archiver')('zip', { level: 9 }); // Sets the compression method to maximum. 
+        const archive = require('archiver')('zip', { level: 9 }); // Sets the compression method to maximum.
 
-        // Good practice to catch this error explicitly 
+        // Good practice to catch this error explicitly
         archive.on('error', function (err) { throw err; });
 
         // Set the archive name
         res.attachment(domain.title + '-Backup-' + new Date().toLocaleDateString().replace('/', '-').replace('/', '-') + '.zip');
 
-        // Pipe archive data to the file 
+        // Pipe archive data to the file
         archive.pipe(res);
 
         // Append all of the files for this backup
@@ -2065,7 +2067,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates) {
             if (obj.fs.existsSync(filepath)) { archive.file(filepath, { name: filename }); }
         }
 
-        // Finalize the archive (ie we are done appending files but streams have to finish yet) 
+        // Finalize the archive (ie we are done appending files but streams have to finish yet)
         archive.finalize();
     }
 
@@ -2532,7 +2534,7 @@ module.exports.CreateWebServer = function (parent, db, args, certificates) {
             // Creates a login token using the user/pass that is passed in as URL arguments.
             // For example: https://localhost/createLoginToken.ashx?user=admin&pass=admin&a=3
             // It's not advised to use this to create login tokens since the URL is often logged and you got credentials in the URL.
-            // Since it's bad, it's only offered when an untrusted certificate is used as a way to help developers get started. 
+            // Since it's bad, it's only offered when an untrusted certificate is used as a way to help developers get started.
             if (isTrustedCert() == false) {
                 obj.app.get(url + 'createLoginToken.ashx', function (req, res) {
                     // A web socket session can be authenticated in many ways (Default user, session, user/pass and cookie). Check authentication here.
